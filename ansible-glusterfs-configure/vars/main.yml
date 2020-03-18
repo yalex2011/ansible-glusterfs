@@ -1,0 +1,8 @@
+---
+# vars file for ansible-glusterfs
+
+gluster_options: {
+  cluster.min-free-disk: 10%
+}
+
+SLAVE_COUNT: "{{ ansible_play_hosts | length - 1 }}"

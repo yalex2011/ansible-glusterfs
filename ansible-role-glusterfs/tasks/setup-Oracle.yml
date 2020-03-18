@@ -1,0 +1,15 @@
+---
+- name: Ensure dependencies are installed.
+  yum:
+    name: "oracle-gluster-release-el7"
+    state: present
+
+- name: Run config repo script
+  shell: /usr/bin/ol_yum_configure.sh 
+
+- name: Ensure Gluster packages are installed.
+  yum:
+    name:
+      - glusterfs-server
+      - glusterfs-client
+    state: present

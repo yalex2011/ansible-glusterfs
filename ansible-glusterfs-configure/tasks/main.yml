@@ -1,0 +1,55 @@
+---
+# tasks file for ansible-glusterfs
+
+- name: Crete dir
+  file:
+    path: "{{ glusterfs_path }}/{{ item }}"
+    state: directory
+  become: true
+  loop: "{{ glusterfs_volume }}"
+
+- block:
+
+  - name: Create a trusted storage pool
+    gluster_peer:
+      nodes: "{{ ansible_play_batch }}"
+      state: present
+
+  - name: create gluster volume
+    gluster_volume:
+      name: "{{ item }}"
+      bricks: "{{ glusterfs_path }}/{{ item }}"
+      replicas: "{{ ansible_play_hosts | length }}"
+      cluster: "{{ ansible_play_hosts }}"
+      state: present
+      # state: absent
+      options: "{{ gluster_options }}"
+      force: true
+    run_once: true
+    become: true
+    loop: "{{ glusterfs_volume }}"
+
+  when: gluster_master is defined
+
+- name: Create mount dir
+  file:
+    name: "/mnt/{{ item }}"
+    state: directory
+  become: true
+  loop: "{{ glusterfs_volume }}"
+
+- name: Mount volumes
+  mount:
+    src: "{{ gluster_master }}:/{{ item }}"
+    path: "/mnt/{{ item }}"
+    fstype: glusterfs
+    state: mounted
+  become: true
+  loop: "{{ glusterfs_volume }}"
+
+# Test 
+
+# - name: Create files
+#   file:
+#     path: "/mnt/glusterfs/{{ ansible_hostname }}"
+#     state: touch

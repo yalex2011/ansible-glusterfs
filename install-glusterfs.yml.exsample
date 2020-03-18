@@ -1,0 +1,13 @@
+---
+
+- hosts: all
+  vars:
+    gluster_master: Unbreakable1
+    glusterfs_path: /data
+    glusterfs_volume:
+        - configs
+        - data
+
+  roles:
+    - glusterfs/ansible-role-glusterfs
+    - glusterfs/ansible-glusterfs-configure
